@@ -1,57 +1,64 @@
 <template>
   <!-- <div v-if="course == {}">loading</div>
   <div v-else> -->
+  <!-- <div>{{ courses }}</div> -->
   <div>
-    {{ name }}
-    {{ course }}
-    {{ users }}
-    {{ temp }}
+    <el-col
+      v-for="(course, i) in courses"
+      :key="i"
+      :span="8"
+    >
+      <el-card shadow="hover">
+        <d-title :title="course.title" />
+        <d-lecturer :lecturer="course.lecturers" />
+        <d-category :category="course.category" />
+        <d-summary :summary="course.summary" />
+        <d-schedule-semester :schedule="course.schedule" />
+        <d-schedule-times :schedule="course.schedule" />
+      </el-card>
+    </el-col>
   </div>
 </template>
 
 <script lang="ts">
 import {
-  computed,
   defineComponent,
   onMounted,
   reactive,
   toRefs,
 } from 'vue';
 import request from '@/api/request';
+// import { Basic, CourseInfo } from '@/assets/CourseInfo';
+// import { PropType } from '@vue/composition-api';
+import DTitle from '@/components/data/d_title.vue';
+import DLecturer from '@/components/data/d_lecturer.vue';
+import DCategory from '@/components/data/d_category.vue';
+import DSummary from '@/components/data/d_summary.vue';
+import DScheduleSemester from '@/components/data/d_schedule_semester.vue';
+import DScheduleTimes from '@/components/data/d_schedule_times.vue';
 
 export default defineComponent({
-  props: {
-    msg: String,
+  components: {
+    DTitle,
+    DLecturer,
+    DCategory,
+    DSummary,
+    DScheduleSemester,
+    DScheduleTimes,
   },
-  setup(props) {
-    const func = () => {
-      console.log('hello');
-    };
-
+  setup() {
     const state = reactive({
-      name: '',
-      temp: {},
+      courses: [{}],
     });
-    let course: any = reactive([]);
 
     onMounted(async () => {
-      console.log('hello');
-      const course2 = await request.fetchAndStoreCourses('search?');
-      console.log(course2);
-      console.log('hello');
-      course = course2;
-      console.log(course);
-      [state.temp] = course2;
-      state.name = 'hello';
+      const fetchedData = await request.fetchAndStoreCourses('search?');
+      state.courses = fetchedData.slice(0, 10);
     });
 
-    // const users = await request.fetchAndStoreCourses('search?');
-
-    // const data2 = computed(() => data.course);
+    // const titleData = computed((title: Object) => props.courseData.title.name);
 
     return {
-      // users,
-      course,
       ...toRefs(state),
     };
   },
